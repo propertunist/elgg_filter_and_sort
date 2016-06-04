@@ -54,7 +54,7 @@ to do:
 * support for search results lists
 * integrate in with supajax plugin to allow full ajaxed lists and sorting/filtering.
 
-IF YOU VALUE THIS PLUGIN, CONSIDER MAKING A DONATION AT WWW.UREKA.ORG/DONATION
+IF YOU VALUE THIS PLUGIN, CONSIDER MAKING A DONATION AT www.ureka.org/donate
 
 =============================
 CHANGELOG
