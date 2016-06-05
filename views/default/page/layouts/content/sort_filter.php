@@ -511,18 +511,12 @@ if (!$filter_params['no_sort'])
         $default_from_date = strtotime('-10 year');
         $default_to_date = time();
 
-
+        $params['value'] = $filter_params['timing-from'];
         if ($filter_params['timing-from'] == 'all')
         {
           $filter_params['timing-from'] = $default_from_date;
         }
-        if ($filter_params['timing-to'] == 'all')
-        {
-          $filter_params['timing-to'] = $default_to_date;
-        }
-        if ($filter_params) {
-             $params['value'] = $filter_params['timing-from'];
-         }
+
          $filter_options .= '<div class="clearfloat"></div>';
          $filter_options .= '<div class="elgg-filter-option-odd">';
 
@@ -537,14 +531,21 @@ if (!$filter_params['no_sort'])
 
          $filter_options .= '</div>';
 
-          if ($filter_params) {
-               $params['value'] = $filter_params['timing-to'];
-           }
-           $filter_options .= '<div class="elgg-filter-option-odd">';
 
-           $filter_options .= '<label title="' . elgg_echo('sort:title:label:timing-to') . '"><small>' . elgg_echo('sort:filter:date_period-to') . '</small></label>';
+         if ($filter_params['timing-to'] == 'all')
+         {
+           $params['value'] = elgg_echo('now');
+           $filter_params['timing-to'] = $default_to_date;
+         }
+         else {
+           $params['value'] = $filter_params['timing-to'];
+         }
 
-           $filter_options .= elgg_view('input/date', array(
+         $filter_options .= '<div class="elgg-filter-option-odd">';
+
+         $filter_options .= '<label title="' . elgg_echo('sort:title:label:timing-to') . '"><small>' . elgg_echo('sort:filter:date_period-to') . '</small></label>';
+
+         $filter_options .= elgg_view('input/date', array(
                    'value' => $params['value'],
                    'name' => 'timing-to',
                    'timestamp' => true,
