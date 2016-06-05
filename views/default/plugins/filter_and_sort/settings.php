@@ -1,7 +1,8 @@
 <div class="filter_and_sort-panel">
 <?php
-        $supported_list_handlers = array('blog',
-                                         'videolist',
+        $supported_list_handlers = array(
+                                         'activity',
+                                         'blog',
                                          'pages',
                                          'file',
                                          'bookmarks',
@@ -9,12 +10,21 @@
                                          'photos',
                                          'pinboards',
                                          'discussion',
-                                         'poll',
                                          'members',
                                          'groups',
-                                         'activity'
                                       //   'search'
                                        );
+
+        $optional_list_handlers = array('videolist',
+                                        'poll');
+);
+
+        // build list of list handlers that can be used
+        foreach ($optional_list_handlers as $list_handler)
+        {
+            if (elgg_is_active_plugin($list_handler))
+              $supported_list_handlers[] = $list_handler;
+        }
 
         $limit_1 = elgg_get_plugin_setting('limit_1','filter_and_sort');
         if (!$limit_1) {

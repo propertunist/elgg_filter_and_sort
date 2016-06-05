@@ -1,7 +1,13 @@
 <?php
-/**
- * Sidebar view
- */
+
+/************
+ * filter_and_sort - elgg plugin
+ *
+ * Sidebar view for tidypics - cleaned up for filter_and_sort plugin
+ *
+ * @author - ura soul
+ * @website - https://www.ureka.org
+ *******************/
 
 $current_user_guid = elgg_get_logged_in_user_guid();
 

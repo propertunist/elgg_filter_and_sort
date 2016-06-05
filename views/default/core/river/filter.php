@@ -10,7 +10,6 @@ if (elgg_is_logged_in())
     $options = array();
     $options['type=all'] = elgg_echo('river:select', array(elgg_echo('all')));
     $registered_entities = elgg_get_config('registered_entities');
-
     // remove categories from type selector
     if (in_array('hjcategory', $registered_entities['object']))
     {

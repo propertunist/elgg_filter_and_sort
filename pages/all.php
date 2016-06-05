@@ -1,6 +1,6 @@
 <?php
 /**
- * Elgg filter_and_sort plugin: show all items for context
+ * Elgg filter_and_sort plugin: show all list items for context
  *
  * @uses $params - array of variables for use when rendering the page structure
  * @uses $options - array of variables for use when executing the list query in the database

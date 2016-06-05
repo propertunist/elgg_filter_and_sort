@@ -48,88 +48,30 @@ if (($filter_context =='friends')
     unset($filter_params['status']);
 }
 
-// if there are sort/filter parameters available, build the parameter string for urls
-if (($filter_params['sort'])
-||($filter_params['timing-from'])
-||($filter_params['timing-to'])
-||($filter_params['contain'])
-||($filter_params['status'])
-||($filter_params['limit'])
-||($filter_params['list_type'])
-||($filter_params['show_icon'])
-||($filter_params['filter'])
-||($filter_params['objtype']))
-{
-    $href = '?';
-    if ($filter_params['sort'])
-    {
-         $href .= 'sort=' . $filter_params['sort'];
-         $used_param = true;
-    }
-    if ($filter_params['timing-from'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'timing_from=' . $filter_params['timing-from'];
-         $used_param = true;
-    }
-    if ($filter_params['timing-to'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'timing_to=' . $filter_params['timing-to'];
-         $used_param = true;
-    }
-    if ($filter_params['contain'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'contain=' . $filter_params['contain'];
-         $used_param = true;
-    }
-    if ($filter_params['status'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'status=' . $filter_params['status'];
-         $used_param = true;
-    }
-    if ($filter_params['limit'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'limit=' . $filter_params['limit'];
-         $used_param = true;
-    }
-    if ($filter_params['list_type'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'list_type=' . $filter_params['list_type'];
-         $used_param = true;
-    }
-    if ($filter_params['show_icon'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'show_icon=' . $filter_params['show_icon'];
-         $used_param = true;
-    }
-    if ($filter_params['filter'])
-    {
-         if ($used_param)
-            $href .= '&';
-         $href .= 'filter=' . $filter_params['filter'];
-         $used_param = true;
-    }
-    if ($filter_params['objtype'])
-    {
-         if ($used_param)
-            $href .= '&';
-        $href .= $filter_params['objtype'];
+$filter_param_names = array('sort',
+                            'timing-from',
+                            'timing-to',
+                            'contain',
+                            'status',
+                            'limit',
+                            'list_type',
+                            'show_icon',
+                            'filter',
+                            'objtype');
 
-         $used_param = true;
-    }
+// if there are sort/filter parameters available, build the parameter string for urls
+foreach ($filter_param_names as $filter_param_name)
+{
+  if ($filter_params[$filter_param_name])
+  {
+    if (!$used_param)
+      $href = '?';
+    else
+      $href .= '&';
+
+    $href .= $filter_param_name . '=' . $filter_params[$filter_param_name];
+    $used_param = true;
+  }
 }
 
 // output the filter UI
@@ -466,7 +408,6 @@ if (!$filter_params['no_sort'])
       if ($filter_params['objtype_selector'])
       {
         $filter_options .= '<div class="elgg-filter-option-odd">';
-    //    $filter_options .= '<label title="' . elgg_echo('sort:title:label:objtype') . '"><small>' .      elgg_echo('sort:filter:objtype') . '</small></label>';
         $filter_options .= $filter_params['objtype_selector'];
         $filter_options .= '</div>';
       }
@@ -506,8 +447,6 @@ if (!$filter_params['no_sort'])
     if (($context != 'members')&&($context != 'groups'))
     {
         //define default times/dates for date range filtering
-      //  $default_from_date = new DateTime("2010-01-01");
-      //  $default_from_date = $default_from_date->getTimestamp();
         $default_from_date = strtotime('-10 year');
         $default_to_date = time();
 
