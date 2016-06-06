@@ -108,7 +108,7 @@ if ((elgg_is_logged_in()) &&($filter_context != 'group'))
         		'priority' => 300,
         	],
         	'discussion' => [
-        		'text' => elgg_echo('groups:latestdiscussion'),
+        		'text' => elgg_echo('discussion:latest'),
         		'href' => (isset($href)) ? 'groups/all' . $href . '&filter=discussion':  'groups/all' . '?filter=discussion',
         		'priority' => 400,
         	]
