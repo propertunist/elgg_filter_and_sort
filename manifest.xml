@@ -3,7 +3,7 @@
 	<name>Filter and sort</name>
 	<author>ura soul</author>
   <id>filter_and_sort</id>
-	<version>2.0</version>
+	<version>0.2</version>
 	<category>Misc</category>
 	<description>adds sort and filter options for entity lists.</description>
 	<website>https://www.ureka.org/</website>
@@ -11,7 +11,7 @@
 	<license>GNU Public License version 2</license>
 	<requires>
 		<type>elgg_release</type>
-		<version>2.0</version>
+		<version>1.9</version>
 	</requires>
 	<requires>
 		<type>priority</type>
