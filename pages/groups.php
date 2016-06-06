@@ -28,7 +28,7 @@
  {
   $filter_params['context'] = 'discussion-groups';
   elgg_push_context('discussion-groups');
-  $subtype = 'groupforumtopic';
+  $subtype = 'discussion';
  }
  else
  {
@@ -52,13 +52,13 @@ $filter_params['filter_context'] = $selected_tab;
   {
     $options['relationship'] = 'member';
     $options['inverse_relationship'] = false;
-    $options['getter'] = 'elgg_get_entities_from_relationship_count';
+    $getter = 'elgg_get_entities_from_relationship_count';
     break;
   }
   case 'discussion':
   {
       $options['type'] = 'object';
-      $options['subtype'] = 'groupforumtopic';
+      $options['subtype'] = 'discussion';
     //  $options['preload_owners'] = true;
     //  $options['preload_containers'] = true;
     break;
@@ -98,12 +98,12 @@ $filter_params['filter_context'] = $selected_tab;
   {
  		$options['metadata_name'] = 'featured_group';
     $options['metadata_value'] = 'yes';
-    $options['getter'] = 'elgg_get_entities_from_metadata';
+    $getter = 'elgg_get_entities_from_metadata';
  		break;
   }
  	case 'open':
   {
-    $options['getter'] = 'elgg_get_entities_from_metadata';
+    $getter = 'elgg_get_entities_from_metadata';
  		$options['metadata_name_value_pairs'] = [
  			'name' => 'membership',
  			'value' => ACCESS_PUBLIC,
@@ -113,7 +113,7 @@ $filter_params['filter_context'] = $selected_tab;
   }
  	case 'closed':
   {
-    $options['getter'] = 'elgg_get_entities_from_metadata';
+    $getter = 'elgg_get_entities_from_metadata';
  		$options['metadata_name_value_pairs'] = [
  			'name' => 'membership',
  			'value' => ACCESS_PUBLIC,
@@ -148,6 +148,7 @@ $filter_params['filter_context'] = $selected_tab;
 $filter_params['selected'] = $selected_tab;
 
  $sort_filter_options = elgg_get_sort_filter_options(array('options' => $options,
+                                                           'getter' => $getter,
                                                            'filter_params' => $filter_params,
                                                            'page_type' => $subtype));
 
@@ -157,20 +158,15 @@ $filter_params['selected'] = $selected_tab;
  $filter_params = $sort_filter_options['filter_params'];
  $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];
  $filter_params['toggle'] = elgg_filter_and_sort_register_toggle($filter_params['list_type']);
- //$filter_params['filter_context'] = $selected_tab;
 
-
- if (!$options['getter'])
-  $options['getter'] = $sort_filter_options['getter'];
+elgg_dump($sort_filter_options);
 
  // content variable may be set by suggested groups code (or other code)
  if (!$content)
  {
-    $content = elgg_list_entities($options,$options['getter']);
-
-   // count the list size
-   $options['count'] = TRUE;
-   $count = elgg_get_entities($options,$options['getter']);
+    $content = elgg_list_entities($options,$sort_filter_options['getter']);
+    $count = filter_and_sort_count_list($sort_filter_options['getter'],
+                                        $options);
  }
 
  if ($count == 0)

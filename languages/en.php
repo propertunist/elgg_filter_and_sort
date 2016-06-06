@@ -72,7 +72,7 @@ return array (
   'sort:timing' => 'time period',
   'sort:draft' => 'drafts only',
   'sort:published' => 'published only',
-  'sort:type=object&subtype=groupforumtopic' => 'discussions',
+  'sort:type=object&subtype=discussion' => 'discussions',
   'sort:type=object&subtype=blog' => 'blogs',
   'sort:type=object&subtype=videolist_item' => 'videos',
   'sort:type=object&subtype=page_top' => 'pages',
