@@ -54,7 +54,7 @@ $sort_filter_params = elgg_get_sort_filter_options(array('options' => $options,
 
 $list = elgg_list_entities_from_metadata($sort_filter_params['options']);
 $sort_filter_params['options']['count'] = TRUE;
-$count = elgg_get_entities($sort_filter_params['options']);
+$count = elgg_get_entities_from_metadata($sort_filter_params['options']);
 if (elgg_is_xhr())
 {
         echo $list;
