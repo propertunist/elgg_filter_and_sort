@@ -231,7 +231,7 @@ if ((elgg_is_logged_in()) &&($filter_context != 'group'))
 
         if ((elgg_is_active_plugin('blog_tools'))&&($context == 'blog'))
             $tabs['featured'] = array(
-                'text' => elgg_echo('blog_tools:menu:filter:featured'),
+                'text' => elgg_echo('status:featured'),
                 'href' => "blog/featured" . $href,
                 'selected' => ($filter_params['filter_context'] == 'featured'),
                 'priority' => 600,
