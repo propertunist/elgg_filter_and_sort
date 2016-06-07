@@ -235,13 +235,11 @@ else
         $params['content'] = $list;
 
         // count the list size
-        $sort_filter_options['options']['count'] = TRUE;
-        if ($sort_filter_options['getter'] == 'elgg_get_entities_from_annotation_calculation')
-            $count = elgg_get_entities_from_annotation_calculation($sort_filter_options['options']);
-        else
-            $count = elgg_get_entities($sort_filter_options['options']);
+        $count = filter_and_sort_count_list($sort_filter_options['getter'],
+                                            $sort_filter_options['options']);
 
-        if ($count == 0) {
+        if ($count == 0)
+        {
              if ($sort_filter_options['no-items'])
                 $no_items = $sort_filter_options['no-items'];
 
@@ -259,7 +257,7 @@ else
         }
         else
         {
-            elgg_load_js('tidypics');
+            elgg_require_js('tidypics/tidypics');
             elgg_load_js('lightbox');
             elgg_load_css('lightbox');
             if (elgg_get_plugin_setting('slideshow', 'tidypics')) {
