@@ -8,6 +8,46 @@
  * @website - https://www.ureka.org
  *******************/
 
+ /*************
+  * filter_and_sort_count_list()
+  *
+  * workaround for the lack of support for a 'getter' variable in elgg_get_entities
+  *
+  * $param  string the function to use as a getter
+  * $param  array  options to use when retrieving data to count
+  * @return int    a count of the number of entities found
+  **/
+
+ function filter_and_sort_count_list($getter, $options)
+ {
+    // count the list size
+    $options['count'] = TRUE;
+    switch ($getter)
+    {
+        case 'elgg_get_entities_from_metadata':
+        {
+          $count = elgg_get_entities_from_metadata($options);
+          break;
+        }
+        case 'elgg_get_entities_from_annotations':
+        {
+          $count = elgg_get_entities_from_annotations($options);
+          break;
+        }
+        case 'elgg_get_entities_from_annotation_calculation':
+        {
+          $count = elgg_get_entities_from_annotation_calculation($options);
+          break;
+        }
+        default:
+        {
+          $count = elgg_get_entities($options);
+          break;
+        }
+    }
+    return $count;
+}
+
 /*************
  * filter_and_sort_isValidTimeStamp()
  *
@@ -241,7 +281,11 @@ function elgg_get_sort_filter_options($vars)
     $dbprefix = elgg_get_config("dbprefix");
 
     // set defaults
-    $getter = 'elgg_get_entities';
+    if (!$vars['getter'])
+        $getter = 'elgg_get_entities';
+    else
+        $getter = $vars['getter'];
+
     $no_items = elgg_echo('sort:no-items');
     $limit_1 = elgg_get_plugin_setting('limit_1','filter_and_sort');
     $limit_2 = elgg_get_plugin_setting('limit_2','filter_and_sort');
@@ -272,7 +316,7 @@ function elgg_get_sort_filter_options($vars)
     }
 
     // bult query parameters for various list views
-    
+
     // online view for members does not have any special parameters so skip it
     if ($filter_params['filter_context'] != 'online')
     {
@@ -383,7 +427,7 @@ function elgg_get_sort_filter_options($vars)
                     }
                     default:{
                         $options['joins'] = array("JOIN " . $dbprefix . "objects_entity oe ON e.guid = oe.guid");
-                        if ($subtype == 'thewire')
+                        if ($options['subtype'] == 'thewire')
                             $options['order_by'] = "oe.description ASC";
                         else
                             $options['order_by'] = "oe.title ASC";
@@ -421,7 +465,7 @@ function elgg_get_sort_filter_options($vars)
               }
              case 'comments_a':
               {
-                if ($subtype != 'groupforumtopic')
+                if ($options['subtype'] != 'groupforumtopic')
                 {
                         $options['selects'][] = "count( * ) AS views";
                         $options['order_by'] = "views DESC";
@@ -441,7 +485,7 @@ function elgg_get_sort_filter_options($vars)
               }
              case 'comments_d':
               {
-                if ($subtype != 'groupforumtopic')
+                if ($options['subtype'] != 'groupforumtopic')
                 {
                         $options['selects'][] = "count( * ) AS views";
                         $options['order_by'] = "views ASC";
@@ -610,7 +654,6 @@ function elgg_get_sort_filter_options($vars)
            if (elgg_is_active_plugin('file'))
            {
                 unset($options['subtype']);
-
                 $options['subtypes'][] = 'videolist_item';
                 $options['subtypes'][] = 'file';
               //  elgg_dump($filter_params['context']);
