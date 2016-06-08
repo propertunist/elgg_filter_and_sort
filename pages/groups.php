@@ -158,13 +158,14 @@ $filter_params['selected'] = $selected_tab;
 if ($selected_tab == 'ordered')
 {
  		$options['order_by'] = 'CAST(order_val AS SIGNED) ASC, e.time_created DESC';
+    unset ($options['joins']);
 }
 // process filter options and cookie data
  $filter_params = $sort_filter_options['filter_params'];
  $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];
  $filter_params['toggle'] = elgg_filter_and_sort_register_toggle($filter_params['list_type']);
 
-//elgg_dump($sort_filter_options);
+//elgg_dump($options);
 
  // content variable may be set by suggested groups code (or other code)
  if (!$content)
