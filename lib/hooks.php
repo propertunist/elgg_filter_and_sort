@@ -181,7 +181,7 @@ function filter_and_sort_route_hook($hook, $type, $return_value, $params){
                       case 'all':
                       {
                         $selected_tab = get_input('filter', 'all');
-                        $group_filters = array('all','discussion','featured','open','closed','suggested','yours', 'popular');
+                        $group_filters = array('all','discussion','featured','open','closed','suggested','yours', 'popular', 'ordered');
                         if (!in_array($selected_tab,$group_filters))
                         {
                             $selected_tab = 'all';

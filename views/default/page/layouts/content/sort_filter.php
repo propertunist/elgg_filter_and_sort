@@ -398,6 +398,7 @@ if (!$filter_params['no_sort'])
 
     if (($filter_context != 'online')
       &&($filter_context != 'popular')
+      &&($filter_context != 'ordered')
       &&($context != 'activity'))
         $filter_options .= '<div class="elgg-filter-option-even"><label title="' . elgg_echo('sort:title:label:sort') . '"><small>' . elgg_echo('sort:label') . '</label></small> ' . elgg_view('input/dropdown', $params) . '</div>';
 
