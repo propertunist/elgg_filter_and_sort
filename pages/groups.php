@@ -18,7 +18,7 @@
  }
 
  $selected_tab = get_input('filter');
- $group_filters = array('all','discussion','featured','open','closed','yours','suggested', 'popular');
+ $group_filters = array('all','discussion','featured','open','closed','yours','suggested', 'popular', 'ordered');
  if (!in_array($selected_tab,$group_filters))
   $selected_tab = 'all';
  // array for defining sorting/filtering options and associated UI element states
@@ -63,8 +63,8 @@ $filter_params['filter_context'] = $selected_tab;
     //  $options['preload_containers'] = true;
     break;
   }
- /*	case 'ordered':
-
+ 	case 'ordered':
+  {
  		$order_id = elgg_get_metastring_id('order');
 
  		$options['limit'] = false;
@@ -76,15 +76,15 @@ $filter_params['filter_context'] = $selected_tab;
  			WHERE e.guid = mo.entity_guid
  			AND mo.name_id = {$order_id}), 99999) AS order_val",
  		];
-
- 		$options['order_by'] = 'CAST(order_val AS SIGNED) ASC, e.time_created DESC';
-
+    $getter = 'elgg_get_entities_from_metadata';
+/*
  		if (elgg_is_admin_logged_in()) {
  			elgg_require_js('group_tools/ordered_list');
  			$options['list_class'] = 'group-tools-list-ordered';
  		}
-
- 		break; */
+*/
+ 		break;
+  }
  	case 'yours':
   {
  		elgg_gatekeeper();
@@ -154,12 +154,17 @@ $filter_params['selected'] = $selected_tab;
 
  $options = array_merge($options, $sort_filter_options['options']);
 
+// add in order clause since it will have been overwritten in elgg_get_sort_filter_options
+if ($selected_tab == 'ordered')
+{
+ 		$options['order_by'] = 'CAST(order_val AS SIGNED) ASC, e.time_created DESC';
+}
 // process filter options and cookie data
  $filter_params = $sort_filter_options['filter_params'];
  $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];
  $filter_params['toggle'] = elgg_filter_and_sort_register_toggle($filter_params['list_type']);
 
-elgg_dump($sort_filter_options);
+//elgg_dump($sort_filter_options);
 
  // content variable may be set by suggested groups code (or other code)
  if (!$content)
