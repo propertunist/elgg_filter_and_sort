@@ -201,7 +201,6 @@ function filter_and_sort_get_cookie($context, $group_guid){
  * @uses $vars['page_type'] - the type of page being processed (group/all etc.)
  * @return array ['options'] - elgg/sql query options
  *         string ['getter'] - which elgg getter function to use to get data
- *         string ['no-items'] - what to display if no data is returned
  *         array ['filter_params'] - parameters for specific filter options
  *         bool['cookie_loaded'] - was the cookie found and loaded?
  */
@@ -248,35 +247,38 @@ function elgg_get_sort_filter_options($vars)
                 $filter_params = $cookie_data;
     }
 
-    // build query string for object/subtype selector input control
-    if ($filter_params['type'])
+    if (elgg_is_logged_in())
     {
-        if (in_array($filter_params['type'], array('group', 'user', 'object')))
+        // build query string for object/subtype selector input control
+        if ($filter_params['type'])
         {
-            // check that subtype is a valid one and add to selector string if valid
-            $registered_subtypes = elgg_get_config('registered_entities');
-        	if (($filter_params['subtype'])&&(in_array($filter_params['subtype'],$registered_subtypes['object']))) {
-        		$selector = "type=" . $filter_params['type'] . "&subtype=" . $filter_params['subtype'];
-        	} else {
-        		$selector = "type=" . $filter_params['type'];
-        	}
+            if (in_array($filter_params['type'], array('group', 'user', 'object')))
+            {
+                // check that subtype is a valid one and add to selector string if valid
+                $registered_subtypes = elgg_get_config('registered_entities');
+            	if (($filter_params['subtype'])&&(in_array($filter_params['subtype'],$registered_subtypes['object']))) {
+            		$selector = "type=" . $filter_params['type'] . "&subtype=" . $filter_params['subtype'];
+            	} else {
+            		$selector = "type=" . $filter_params['type'];
+            	}
+            }
         }
+
+        // pass object and subtype to the options array
+      	if (($filter_params['type'] != 'all')&&($filter_params['type'])) {
+      		$options['type'] = $filter_params['type'];
+      		if ($filter_params['subtype']) {
+      			$options['subtype'] = $filter_params['subtype'];
+      		}
+      	}
+
+        if ($selector)
+        	$filter_params['objtype'] = $selector;
+
+        // if objtype selector is set to user or group, remove the container variable and thus also remove the input control completely
+        if (($filter_params['objtype'] == 'type=user')||($filter_params['objtype']== 'type=group'))
+          unset ($filter_params['contain']);
     }
-
-    // pass object and subtype to the options array
-  	if (($filter_params['type'] != 'all')&&($filter_params['type'])) {
-  		$options['type'] = $filter_params['type'];
-  		if ($filter_params['subtype']) {
-  			$options['subtype'] = $filter_params['subtype'];
-  		}
-  	}
-
-    if ($selector)
-    	$filter_params['objtype'] = $selector;
-
-    // if objtype selector is set to user or group, remove the container variable and thus also remove the input control completely
-    if (($filter_params['objtype'] == 'type=user')||($filter_params['objtype']== 'type=group'))
-      unset ($filter_params['contain']);
 
     $dbprefix = elgg_get_config("dbprefix");
 
@@ -611,7 +613,6 @@ function elgg_get_sort_filter_options($vars)
               break;
         }
     }
-
     // subtype specific query parameters
     switch ($options['subtype'])
     {
@@ -646,6 +647,12 @@ function elgg_get_sort_filter_options($vars)
             }
             $options['container_guids'] = null;
             $options['container_guid'] = null;
+            $filter_params['list_type'] = 'gallery';
+            break;
+        }
+        case 'album':
+        {
+            $filter_params['list_type'] = 'gallery';
             break;
         }
         case 'videolist_item':
@@ -671,18 +678,13 @@ function elgg_get_sort_filter_options($vars)
         }
     }
 
-    // only show gallery views for image types
-    if (($subtype=='image')&&($subtype=='album'))
-    {
-        $filter_params['list_type'] = 'gallery';
-    }
-
     if ($filter_params['list_type'])
         $options['list_type'] = $filter_params['list_type'];
 
+    $options['no_results'] = $no_items;
+
     return array('options' => $options,
                  'getter' => $getter,
-                 'no-items' => $no_items,
                  'filter_params' => $filter_params,
                  'cookie_loaded' => $cookie_loaded);
 }
@@ -812,7 +814,7 @@ function filter_and_sort_get_object_type_from_context($context)
  * @return array $mods    the array of page handler IDs, including any hijacked values
  */
 
-function filter_and_sort_map_hijacks($mods)
+function filter_and_sort_map_hijacks($mods = NULL)
 {
     if ($mods == NULL)
             $mods = array ( 'blog'=>'blog',
