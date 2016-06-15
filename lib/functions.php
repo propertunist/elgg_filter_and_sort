@@ -646,6 +646,12 @@ function elgg_get_sort_filter_options($vars)
             }
             $options['container_guids'] = null;
             $options['container_guid'] = null;
+	    $filter_params['list_type'] = 'gallery';
+            break;
+        }
+        case 'album':
+        {
+            $filter_params['list_type'] = 'gallery';
             break;
         }
         case 'videolist_item':
@@ -654,6 +660,7 @@ function elgg_get_sort_filter_options($vars)
            if (elgg_is_active_plugin('file'))
            {
                 unset($options['subtype']);
+
                 $options['subtypes'][] = 'videolist_item';
                 $options['subtypes'][] = 'file';
               //  elgg_dump($filter_params['context']);
@@ -671,11 +678,6 @@ function elgg_get_sort_filter_options($vars)
         }
     }
 
-    // only show gallery views for image types
-    if (($subtype=='image')&&($subtype=='album'))
-    {
-        $filter_params['list_type'] = 'gallery';
-    }
 
     if ($filter_params['list_type'])
         $options['list_type'] = $filter_params['list_type'];
