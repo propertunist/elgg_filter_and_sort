@@ -4,17 +4,60 @@
  *
  * functions used in the filter_and_sort plugin.
  *
- * @Author - ura soul
+ * @author - ura soul
  * @website - https://www.ureka.org
  *******************/
 
+ /*************
+  * filter_and_sort_count_list()
+  *
+  * workaround for the lack of support for a 'getter' variable in elgg_get_entities
+  *
+  * $param  string the function to use as a getter
+  * $param  array  options to use when retrieving data to count
+  * @return int    a count of the number of entities found
+  **/
+
+ function filter_and_sort_count_list($getter, $options)
+ {
+    // count the list size
+    $options['count'] = TRUE;
+    switch ($getter)
+    {
+        case 'elgg_get_entities_from_metadata':
+        {
+          $count = elgg_get_entities_from_metadata($options);
+          break;
+        }
+        case 'elgg_get_entities_from_annotations':
+        {
+          $count = elgg_get_entities_from_annotations($options);
+          break;
+        }
+        case 'elgg_get_entities_from_annotation_calculation':
+        {
+          $count = elgg_get_entities_from_annotation_calculation($options);
+          break;
+        }
+        default:
+        {
+          $count = elgg_get_entities($options);
+          break;
+        }
+    }
+    return $count;
+}
+
 /*************
- * isValidTimeStamp()
+ * filter_and_sort_isValidTimeStamp()
  *
  * perform simple tests to ensure a variable is a valid unix timestamp
+ *
+ * $param  string a string representing a UNIX timestamp.
+ * @return bool   true if timestamp is a valid one, false if not.
  **/
 
- function isValidTimeStamp($timestamp)
+ function filter_and_sort_isValidTimeStamp($timestamp)
  {
      return ((string) (int) $timestamp === $timestamp)
          && ($timestamp <= PHP_INT_MAX)
@@ -25,6 +68,10 @@
  * casort
  *
  * - sort an array of strings in alphabetical order
+ *
+ * $param  array  the array of strings to sort
+ * $param  string the key against which to sort
+ * @return array  the sorted array of strings
  */
 
 if (!function_exists('casort'))
@@ -54,6 +101,7 @@ if (!function_exists('casort'))
  * - create browser cookie for given context and group
  *
  * @uses $vars  input variables for cookie
+ * @return bool true if successful, false if not
  */
 
 function filter_and_sort_set_cookie($vars){
@@ -123,6 +171,7 @@ function filter_and_sort_set_cookie($vars){
  *
  * @uses $context - the context for which to retrieve cookie data
  * @uses $group_guid - the group guid for which to retrieve cookie data
+ * @return array|bool - the cookie data or false if none found
  */
 
 function filter_and_sort_get_cookie($context, $group_guid){
@@ -146,13 +195,23 @@ function filter_and_sort_get_cookie($context, $group_guid){
  *
  * - configures and prepares input fields for use in the filtering/sorting panel for entity lists
  * - builds relevant query parameters for retrieving list data
+ *
+ * @uses $vars['filter_params'] - parameters for specific filter options
+ * @uses $vars['options'] - elgg/sql query options for list retrieval
+ * @uses $vars['page_type'] - the type of page being processed (group/all etc.)
+ * @return array ['options'] - elgg/sql query options
+ *         string ['getter'] - which elgg getter function to use to get data
+ *         string ['no-items'] - what to display if no data is returned
+ *         array ['filter_params'] - parameters for specific filter options
+ *         bool['cookie_loaded'] - was the cookie found and loaded?
  */
 
 function elgg_get_sort_filter_options($vars)
 {
     $options = $vars['options'];
     $page_type = $vars['page_type'];
-    // array for defining sorting/filtering options and associated UI element states
+
+    // define array for defining sorting/filtering options and associated UI element states
     if (!$vars['filter_params'])
     {
       $filter_params = array();
@@ -164,6 +223,8 @@ function elgg_get_sort_filter_options($vars)
     }
 
     $cookie_loaded = false;
+
+    // if a container was provided, check if it is a group
     $container = get_entity($options['container_guid']);
     if (elgg_instanceof($container, 'group'))
             $group_guid = $options['container_guid'];
@@ -172,11 +233,12 @@ function elgg_get_sort_filter_options($vars)
     if ($cookie_data = filter_and_sort_get_cookie(elgg_get_context(),$group_guid))
     {
             $cookie_loaded = true;
-
+            // combine cookie data with existing filter params if possible
             if (is_array($filter_params))
             {
                 // the + operator adds to the left array, any keys from the right array that are not present in the left array. duplicates are NOT overwritten. therefore, parameters that originate in the UI or address bar will take priority over cookie values. defaults therefore need to be blank for cookie values to be used.
                 $filter_params = $filter_params + $cookie_data;
+
                 if (($filter_params['type'] == 'all')||($filter_params['type'] == 'group')||($filter_params['type'] == 'user'))
                 {
                   $filter_params['subtype'] = NULL;
@@ -186,14 +248,22 @@ function elgg_get_sort_filter_options($vars)
                 $filter_params = $cookie_data;
     }
 
+    // build query string for object/subtype selector input control
     if ($filter_params['type'])
     {
-    	if ($filter_params['subtype']) {
-    		$selector = "type=" . $filter_params['type'] . "&subtype=" . $filter_params['subtype'];
-    	} else {
-    		$selector = "type=" . $filter_params['type'];
-    	}
+        if (in_array($filter_params['type'], array('group', 'user', 'object')))
+        {
+            // check that subtype is a valid one and add to selector string if valid
+            $registered_subtypes = elgg_get_config('registered_entities');
+        	if (($filter_params['subtype'])&&(in_array($filter_params['subtype'],$registered_subtypes['object']))) {
+        		$selector = "type=" . $filter_params['type'] . "&subtype=" . $filter_params['subtype'];
+        	} else {
+        		$selector = "type=" . $filter_params['type'];
+        	}
+        }
     }
+
+    // pass object and subtype to the options array
   	if (($filter_params['type'] != 'all')&&($filter_params['type'])) {
   		$options['type'] = $filter_params['type'];
   		if ($filter_params['subtype']) {
@@ -204,15 +274,18 @@ function elgg_get_sort_filter_options($vars)
     if ($selector)
     	$filter_params['objtype'] = $selector;
 
-    // if objtype selector is set to user or group, remove the container variable completely
+    // if objtype selector is set to user or group, remove the container variable and thus also remove the input control completely
     if (($filter_params['objtype'] == 'type=user')||($filter_params['objtype']== 'type=group'))
       unset ($filter_params['contain']);
 
-    if(($page_type == 'group'))
-        $filter_params['contain'] = 'all';
-
     $dbprefix = elgg_get_config("dbprefix");
-    $getter = 'elgg_get_entities';
+
+    // set defaults
+    if (!$vars['getter'])
+        $getter = 'elgg_get_entities';
+    else
+        $getter = $vars['getter'];
+
     $no_items = elgg_echo('sort:no-items');
     $limit_1 = elgg_get_plugin_setting('limit_1','filter_and_sort');
     $limit_2 = elgg_get_plugin_setting('limit_2','filter_and_sort');
@@ -226,7 +299,7 @@ function elgg_get_sort_filter_options($vars)
         $filter_params['limit'] = $limit_1;
     }
 
-    // set query limit to url's limit
+    // set query's limit and offset
     $options['limit'] = $filter_params['limit'];
     $options['offset'] = $filter_params['offset'];
 
@@ -242,6 +315,9 @@ function elgg_get_sort_filter_options($vars)
         $getter = 'elgg_get_entities_from_metadata';
     }
 
+    // bult query parameters for various list views
+
+    // online view for members does not have any special parameters so skip it
     if ($filter_params['filter_context'] != 'online')
     {
             // set default sort order
@@ -256,11 +332,11 @@ function elgg_get_sort_filter_options($vars)
             {
                 // set default timing values
                 if ($filter_params['timing-to'])
-                    if (!isValidTimeStamp($filter_params['timing-to']))
+                    if (!filter_and_sort_isValidTimeStamp($filter_params['timing-to']))
                       $filter_params['timing-to'] = 'all';
 
                 if ($filter_params['timing-from'])
-                    if (!isValidTimeStamp($filter_params['timing-from']))
+                    if (!filter_and_sort_isValidTimeStamp($filter_params['timing-from']))
                       $filter_params['timing-from'] = 'all';
 
                 // set default container value
@@ -351,7 +427,7 @@ function elgg_get_sort_filter_options($vars)
                     }
                     default:{
                         $options['joins'] = array("JOIN " . $dbprefix . "objects_entity oe ON e.guid = oe.guid");
-                        if ($subtype == 'thewire')
+                        if ($options['subtype'] == 'thewire')
                             $options['order_by'] = "oe.description ASC";
                         else
                             $options['order_by'] = "oe.title ASC";
@@ -389,7 +465,7 @@ function elgg_get_sort_filter_options($vars)
               }
              case 'comments_a':
               {
-                if ($subtype != 'groupforumtopic')
+                if ($options['subtype'] != 'groupforumtopic')
                 {
                         $options['selects'][] = "count( * ) AS views";
                         $options['order_by'] = "views DESC";
@@ -409,7 +485,7 @@ function elgg_get_sort_filter_options($vars)
               }
              case 'comments_d':
               {
-                if ($subtype != 'groupforumtopic')
+                if ($options['subtype'] != 'groupforumtopic')
                 {
                         $options['selects'][] = "count( * ) AS views";
                         $options['order_by'] = "views ASC";
@@ -515,7 +591,7 @@ function elgg_get_sort_filter_options($vars)
       //   $options['data-baseUrl'] = current_page_url();
     }
 
-    // build query paramters for blog published status
+    // build query parameters for blog published status
     if ($getter == 'elgg_get_entities')
     {
         switch($filter_params['status'])
@@ -535,6 +611,7 @@ function elgg_get_sort_filter_options($vars)
               break;
         }
     }
+
     // subtype specific query parameters
     switch ($options['subtype'])
     {
@@ -569,12 +646,6 @@ function elgg_get_sort_filter_options($vars)
             }
             $options['container_guids'] = null;
             $options['container_guid'] = null;
-	    $filter_params['list_type'] = 'gallery';
-            break;
-        }
-        case 'album':
-        {
-            $filter_params['list_type'] = 'gallery';
             break;
         }
         case 'videolist_item':
@@ -583,7 +654,6 @@ function elgg_get_sort_filter_options($vars)
            if (elgg_is_active_plugin('file'))
            {
                 unset($options['subtype']);
-
                 $options['subtypes'][] = 'videolist_item';
                 $options['subtypes'][] = 'file';
               //  elgg_dump($filter_params['context']);
@@ -601,6 +671,12 @@ function elgg_get_sort_filter_options($vars)
         }
     }
 
+    // only show gallery views for image types
+    if (($subtype=='image')&&($subtype=='album'))
+    {
+        $filter_params['list_type'] = 'gallery';
+    }
+
     if ($filter_params['list_type'])
         $options['list_type'] = $filter_params['list_type'];
 
@@ -614,7 +690,9 @@ function elgg_get_sort_filter_options($vars)
 /****
  * elgg_get_list_type_from_context
  *
+ * @param string $context      the source context
  *
+ * @return array|bool          object type and subtype that relate to the context or false in the case of error or no match.
  *
  */
 
@@ -716,7 +794,10 @@ function filter_and_sort_get_object_type_from_context($context)
             break;
         }
         default:
+        {
+            $return = false;
             break;
+        }
     }
 
     return $return;
@@ -725,7 +806,10 @@ function filter_and_sort_get_object_type_from_context($context)
 /*
  * filter_and_sort_map_hijacks
  *
- * returns a list of page handlers for entity types, including changed handlers that have been changed by pagehandler hijack
+ * returns a list of page handlers for entity types, including changed handlers that have been changed by the elgg plugin 'pagehandler hijack'. this is used to ensure that any handler that have been changed by pagehandler_hijack can be correctly referenced by other code.
+ * @param array $mods     a list of page handler ID strings that are to be potentially hijacked and that we need to return the hijacked handlers for.
+ *
+ * @return array $mods    the array of page handler IDs, including any hijacked values
  */
 
 function filter_and_sort_map_hijacks($mods)
@@ -743,12 +827,14 @@ function filter_and_sort_map_hijacks($mods)
                 'members'=> 'members');
 
     $hijacks = MBeckett\pagehandler_hijack\get_replacement_handlers();
-
-    foreach ($mods as $mod)
+    if ($hijacks)
     {
-        // if a plugin's type is found in the hijacked list of pagehandlers, then replace it in the list of mods with the hijacked version
-        if (array_key_exists($mod, $hijacks))
-            $mods[$mod] = $hijacks[$mod];
+        foreach ($mods as $mod)
+        {
+            // if a plugin's type is found in the hijacked list of pagehandlers, then replace it in the list of mods with the hijacked version
+            if (array_key_exists($mod, $hijacks))
+                $mods[$mod] = $hijacks[$mod];
+        }
     }
     return $mods;
 }
@@ -759,6 +845,10 @@ function filter_and_sort_map_hijacks($mods)
  * - creates a toggle to extra menu for switching between list and gallery views
  *
  * - the current url is updated to contain a query parameter that points to the alternative list_type and returns a hyperlink for that new url
+ *
+ * @param string $list_type     either gallery or list - depending on the display mode that is currently being used for the list on the current page
+ *
+ * @return string output/url    a formatted button that reloads the page with the alternate list view (gallery/list) to the one currently displayed on the page
  */
 
 function elgg_filter_and_sort_register_toggle($list_type) {
@@ -786,6 +876,12 @@ function elgg_filter_and_sort_register_toggle($list_type) {
                                             'title' => elgg_echo("filter_and_sort:list:$list_type")));
 
 }
+
+/**
+ * filter_and_sort_get_input_data
+ *
+ * - retrieve inputs from the browser for use in the filter and sort controls
+ */
 
 function filter_and_sort_get_input_data($filter_options){
 
