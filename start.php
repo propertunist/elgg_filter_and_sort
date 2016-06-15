@@ -23,10 +23,24 @@ function filter_and_sort_init()
     $list_handlers = elgg_get_plugin_setting('list_handlers','filter_and_sort');
     $list_handlers = array_filter(explode(',', $list_handlers));
 
+    if (elgg_is_active_plugin('pagehandler_hijack'))
+    {
+        // get pagehandler hijacks if they exist
+        $mods = filter_and_sort_map_hijacks();
+    }
+
     // add route hooks for each list type (priority is lower than 500 to ensure other hooks run afterwards - needed for group_tools)
     foreach ($list_handlers as $list_handler)
     {
-        elgg_register_plugin_hook_handler("route", $list_handler, "filter_and_sort_route_hook", 100);
+        if ($mods)
+        {
+            if (in_array($list_handler, $mods))
+            $list_handler = $mods[$list_handler];
+        }
+
+        // river page is handled in the resource view
+        if ($list_handler != 'activity')
+            elgg_register_plugin_hook_handler("route", $list_handler, "filter_and_sort_route_hook", 100);
     }
 
     // add hooks for members plugin
@@ -55,8 +69,8 @@ function filter_and_sort_init()
         elgg_unregister_plugin_hook_handler('register', 'menu:filter', 'tag_tools_activity_filter_menu_hook_handler');
     }
 
-    elgg_extend_view('css/elgg', 'filter_and_sort/css');
-    elgg_extend_view('css/admin', 'filter_and_sort/admin');
+    elgg_extend_view('elgg.css', 'filter_and_sort/css');
+    elgg_extend_view('admin.css', 'filter_and_sort/admin');
 }
 
 elgg_register_event_handler('init', 'system', 'filter_and_sort_init');

@@ -236,20 +236,20 @@ if (!$friends = $page_owner->getFriends(array('limit'=> 0))) {
     {
             $params['content'] = $list;
 
-            $sort_filter_options['options']['count'] = TRUE;
+            //$sort_filter_options['options']['count'] = TRUE;
 
             // count the list size
-            $count = filter_and_sort_count_list($sort_filter_options['getter'],
-                                                $sort_filter_options['options']);
+            //$count = filter_and_sort_count_list($sort_filter_options['getter'],
+            //                                    $sort_filter_options['options']);
 
-            if ($count == 0) {
-                 if ($sort_filter_options['no-items'])
-                    $no_items = $sort_filter_options['no-items'];
+            //if ($count == 0) {
+            //     if ($sort_filter_options['no-items'])
+            //        $no_items = $sort_filter_options['no-items'];
 
-                $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
-            } else {
-                $params['content'] = $list;
-            }
+            //    $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' //. $no_items . '</li></ul>';
+            //} else {
+        //        $params['content'] = $list;
+        //    }
     }
 }
 if (elgg_is_xhr())

@@ -139,9 +139,12 @@ function filter_and_sort_route_hook($hook, $type, $return_value, $params){
         $result = $return_value;
         $page = elgg_extract("segments", $return_value);
         $handler = elgg_extract("handler", $return_value);
-
+//elgg_dump($handler);
+//elgg_dump('context = ' . print_r(elgg_get_context_stack(),true));
+//elgg_dump($page);
         switch ($handler) {
-          case 'activity':
+        // activity is now handled via a resource view
+        /*  case 'activity':
           {
             $page_type = (isset($page[0])) ? $page[0] : 'all';
             if ($page_type == 'owner')
@@ -153,6 +156,30 @@ function filter_and_sort_route_hook($hook, $type, $return_value, $params){
 
             include(dirname(dirname(__FILE__)) . "/pages/river.php");
             break;
+          }*/
+          // the main groups listing page
+          case 'groups':
+          {
+              switch($page[0])
+              {
+                case 'all':
+                {
+                  $selected_tab = get_input('filter', 'all');
+                  $group_filters = array('all','discussion','featured','open','closed','suggested','yours', 'popular', 'ordered');
+                  if (!in_array($selected_tab,$group_filters))
+                  {
+                      $selected_tab = 'all';
+                  }
+                  $result = false;
+                  include(dirname(dirname(__FILE__)) . "/pages/groups.php");
+                  break;
+                }
+                default:
+                {
+                  return $result;
+                }
+              }
+              break;
           }
           default:
           {
@@ -173,29 +200,6 @@ function filter_and_sort_route_hook($hook, $type, $return_value, $params){
                     }
                     else
                         return;
-                }
-                case 'group':
-                {
-                    switch($page[0])
-                    {
-                      case 'all':
-                      {
-                        $selected_tab = get_input('filter', 'all');
-                        $group_filters = array('all','discussion','featured','open','closed','suggested','yours', 'popular', 'ordered');
-                        if (!in_array($selected_tab,$group_filters))
-                        {
-                            $selected_tab = 'all';
-                        }
-                        $result = false;
-                        include(dirname(dirname(__FILE__)) . "/pages/groups.php");
-                        break;
-                      }
-                      default:
-                      {
-                        return $result;
-                      }
-                    }
-                    break;
                 }
                 default:
                 {

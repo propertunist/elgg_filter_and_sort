@@ -154,12 +154,25 @@ $filter_params['selected'] = $selected_tab;
 
  $options = array_merge($options, $sort_filter_options['options']);
 
-// add in order clause since it will have been overwritten in elgg_get_sort_filter_options
-if ($selected_tab == 'ordered')
-{
- 		$options['order_by'] = 'CAST(order_val AS SIGNED) ASC, e.time_created DESC';
+switch($selected_tab){
+  case 'ordered':
+  {
+    // add in order clause since it will have been overwritten in elgg_get_sort_filter_options
+    $options['order_by'] = 'CAST(order_val AS SIGNED) ASC, e.time_created DESC';
     unset ($options['joins']);
+    break;
+  }
+  case 'discussion':
+    break;
+  default:
+  {
+    // only discussions need to support times
+    unset ($options['created_time_lower']);
+    unset ($options['created_time_upper']);
+    break;
+  }
 }
+
 // process filter options and cookie data
  $filter_params = $sort_filter_options['filter_params'];
  $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];
@@ -171,15 +184,15 @@ if ($selected_tab == 'ordered')
  if (!$content)
  {
     $content = elgg_list_entities($options,$sort_filter_options['getter']);
-    $count = filter_and_sort_count_list($sort_filter_options['getter'],
-                                        $options);
+  //  $count = filter_and_sort_count_list($sort_filter_options['getter'],
+    //                                    $options);
  }
-
+/*
  if ($count == 0)
  {
    $content = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $sort_filter_options['no-items'] . '</li></ul>';
  }
-
+*/
  // store the current list filter options to a cookie
  filter_and_sort_set_cookie(array('context' => elgg_get_context(),
                          'list_type' => $filter_params['list_type'],

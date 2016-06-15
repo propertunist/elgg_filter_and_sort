@@ -38,10 +38,8 @@ if ($filter_context=='group')
     unset($filter_params['content']);
 }
 
-// no sorting of popular or ordered lists
-if(($filter_context == 'popular')
-||($filter_context == 'ordered'))
-
+// no sorting of popular lists
+if($filter_context == 'popular')
   unset($filter_params['sort']);
 
 // disable status parameter if not needed

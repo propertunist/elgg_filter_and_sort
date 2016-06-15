@@ -335,17 +335,17 @@ else
 {
 
    // count the list size
-   $sort_filter_options['options']['count'] = TRUE;
-   $count = filter_and_sort_count_list($sort_filter_options['getter'],
-                                       $sort_filter_options['options']);
-   if ($count == 0) {
-       if ($sort_filter_options['no-items'])
-          $no_items = $sort_filter_options['no-items'];
+   //$sort_filter_options['options']['count'] = TRUE;
+   //$count = filter_and_sort_count_list($sort_filter_options['getter'],
+   //                                    $sort_filter_options['options']);
+   //if ($count == 0) {
+      // if ($sort_filter_options['no-items'])
+         // $no_items = $sort_filter_options['no-items'];
 
-      $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
-   } else {
+//      $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
+   //} else {
       $params['content'] = $list;
-   }
+   //}
 
    $filter_params = $sort_filter_options['filter_params'];
    $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];

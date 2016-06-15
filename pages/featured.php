@@ -60,16 +60,16 @@ if (elgg_is_xhr())
 }
 else
 {
-    $sort_filter_params['options']['count'] = TRUE;
-    $count = elgg_get_entities_from_metadata($sort_filter_params['options']);
-    if ($count == 0) {
-         if ($sort_filter_params['no-items'])
-            $no_items = $sort_filter_params['no-items'];
+    //$sort_filter_params['options']['count'] = TRUE;
+    //$count = elgg_get_entities_from_metadata($sort_filter_params['options']);
+    //if ($count == 0) {
+//         if ($sort_filter_params['no-items'])
+//            $no_items = $sort_filter_params['no-items'];
 
-        $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
-    } else {
+//        $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
+//    } else {
         $params['content'] = $list;
-    }
+//    }
     $filter_params = $sort_filter_params['filter_params'];
     $filter_params['cookie_loaded'] = $sort_filter_params['cookie_loaded'];
     if (($object_type['subtype'] != 'image')&& ($object_type['subtype'] != 'album'))

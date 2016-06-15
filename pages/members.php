@@ -51,14 +51,14 @@ else
             'title' => $title,
     );
 
-    if ($content['count'] == 0) {
-        if ($sort_filter_options['no-items'])
-            $no_items = $sort_filter_options['no-items'];
+    //if ($content['count'] == 0) {
+//        if ($sort_filter_options['no-items'])
+//            $no_items = $sort_filter_options['no-items'];
 
-        $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
-    } else {
+//        $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
+//    } else {
         $params['content'] = $content['list'];
-    }
+//    }
 
     $filter_params = $sort_filter_options['filter_params'];
     $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];
