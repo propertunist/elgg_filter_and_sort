@@ -14,8 +14,7 @@
 #elgg-filter-options-link:hover,#elgg-reset-sort-filters:hover{text-decoration: underline;cursor:pointer!important;}
 #elgg-toggle-link {margin-left: 10px;position: relative;top: -4px;}
 .elgg-active-sort-filter {color: rgb(51, 51, 51);font-size:70%; border:1px solid rgb(51, 51, 51); border-radius:4px;margin: 5px 6px;display: inline-block; padding: 1px 2px 2px 5px;cursor:pointer;font-weight:bold;}
-.elgg-active-sort-filter > .elgg-icon-delete {background-position: 0 -136px;width: 8px;height: 8px!important;background-size: cover;}
-.elgg-active-sort-filter > .elgg-icon-delete:hover {background-position: 0 -127px;}
+.elgg-active-sort-filter > .elgg-icon-delete {height: 0.6rem; font-size: 0.6rem;padding: 3px 0px 0px 4px;top: -2px;color: rgb(233, 57, 57);}
 .elgg-active-filter-label{font-size:70%; color: rgb(155, 155, 155);vertical-align:text-bottom;}
 .elgg-no-items{height: 3em;line-height: 3em;}
 .list-type-label{position: relative;margin: 0px 3px 0 6px;top: -5px;}

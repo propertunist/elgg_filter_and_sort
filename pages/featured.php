@@ -53,50 +53,51 @@ $sort_filter_params = elgg_get_sort_filter_options(array('options' => $options,
                                                           'page_type' => $subtype));
 
 $list = elgg_list_entities_from_metadata($sort_filter_params['options']);
-$sort_filter_params['options']['count'] = TRUE;
-$count = elgg_get_entities($sort_filter_params['options']);
+
 if (elgg_is_xhr())
 {
         echo $list;
 }
 else
 {
-        if ($count == 0) {
-             if ($sort_filter_params['no-items'])
-                $no_items = $sort_filter_params['no-items'];
+    $sort_filter_params['options']['count'] = TRUE;
+    $count = elgg_get_entities_from_metadata($sort_filter_params['options']);
+    if ($count == 0) {
+         if ($sort_filter_params['no-items'])
+            $no_items = $sort_filter_params['no-items'];
 
-            $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
-        } else {
-            $params['content'] = $list;
+        $params['content'] = '<ul class="elgg-list elgg-sync elgg-list-entity elgg-no-items"><li>' . $no_items . '</li></ul>';
+    } else {
+        $params['content'] = $list;
+    }
+    $filter_params = $sort_filter_params['filter_params'];
+    $filter_params['cookie_loaded'] = $sort_filter_params['cookie_loaded'];
+    if (($object_type['subtype'] != 'image')&& ($object_type['subtype'] != 'album'))
+    {
+        $filter_params['toggle'] = elgg_filter_and_sort_register_toggle($filter_params['list_type']);
+    }
+    else
+    {
+        elgg_require_js('tidypics/tidypics');
+        elgg_load_js('lightbox');
+        elgg_load_css('lightbox');
+        if (elgg_get_plugin_setting('slideshow', 'tidypics')) {
+            elgg_load_js('tidypics:slideshow');
         }
-        $filter_params = $sort_filter_params['filter_params'];
-        $filter_params['cookie_loaded'] = $sort_filter_params['cookie_loaded'];
-        if (($object_type['subtype'] != 'image')&& ($object_type['subtype'] != 'album'))
-        {
-            $filter_params['toggle'] = elgg_filter_and_sort_register_toggle($filter_params['list_type']);
-        }
-        else
-        {
-            elgg_load_js('tidypics');
-            elgg_load_js('lightbox');
-            elgg_load_css('lightbox');
-            if (elgg_get_plugin_setting('slideshow', 'tidypics')) {
-                elgg_load_js('tidypics:slideshow');
-            }
-        }
+    }
 
-        // store the current list filter options to a cookie
-        filter_and_sort_set_cookie(array('context' => elgg_get_context(),
-                                'list_type' => $filter_params['list_type'],
-                                'limit' => $filter_params['limit'],
-                                'contain' => $filter_params['contain'],
-                                'sort' => $filter_params['sort'],
-                                'timing-from' => $filter_params['timing-from'],
-        												'timing-to' => $filter_params['timing-to'],
-                                'status' => $filter_params['status']));
+    // store the current list filter options to a cookie
+    filter_and_sort_set_cookie(array('context' => elgg_get_context(),
+                            'list_type' => $filter_params['list_type'],
+                            'limit' => $filter_params['limit'],
+                            'contain' => $filter_params['contain'],
+                            'sort' => $filter_params['sort'],
+                            'timing-from' => $filter_params['timing-from'],
+    												'timing-to' => $filter_params['timing-to'],
+                            'status' => $filter_params['status']));
 
-        $params['filter'] = elgg_view('page/layouts/content/sort_filter',array('filter_params' => $filter_params));
-        $body = elgg_view_layout('content', $params);
+    $params['filter'] = elgg_view('page/layouts/content/sort_filter',array('filter_params' => $filter_params));
+    $body = elgg_view_layout('content', $params);
 
-        echo elgg_view_page($title, $body);
+    echo elgg_view_page($title, $body);
 }

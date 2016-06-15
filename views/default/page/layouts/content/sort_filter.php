@@ -33,13 +33,15 @@ $current_user = elgg_get_logged_in_user_entity();
 $used_param = false;
 
 // if a specific group is being viewed then disable the container option
-if ($filter_params['filter_context']=='group')
+if ($filter_context=='group')
 {
     unset($filter_params['content']);
 }
+
 // no sorting of popular lists
 if($filter_context == 'popular')
   unset($filter_params['sort']);
+
 // disable status parameter if not needed
 if (($filter_context =='friends')
     &&(!elgg_is_admin_logged_in())
@@ -108,7 +110,7 @@ if ((elgg_is_logged_in()) &&($filter_context != 'group'))
         		'priority' => 300,
         	],
         	'discussion' => [
-        		'text' => elgg_echo('groups:latestdiscussion'),
+        		'text' => elgg_echo('discussion:latest'),
         		'href' => (isset($href)) ? 'groups/all' . $href . '&filter=discussion':  'groups/all' . '?filter=discussion',
         		'priority' => 400,
         	]
@@ -174,19 +176,19 @@ if ((elgg_is_logged_in()) &&($filter_context != 'group'))
           'all' => [
             'text' => elgg_echo('all'),
             'href' => (isset($href)) ? 'members' . $href :  'members',
-            'selected' => ($filter_params['filter_context'] == 'newest'),
+            'selected' => ($filter_context == 'newest'),
             'priority' => 200,
           ],
           'popular' => [
             'text' => elgg_echo('sort:popular'),
             'href' => (isset($href)) ? 'members/popular' . $href :  'members/popular',
-            'selected' => ($filter_params['filter_context'] == 'popular'),
+            'selected' => ($filter_context == 'popular'),
             'priority' => 250,
           ],
           'online' => [
             'text' => elgg_echo('members:label:online'),
             'href' => (isset($href)) ? 'members/online' . $href :  'members/online',
-            'selected' => ($filter_params['filter_context'] == 'online'),
+            'selected' => ($filter_context == 'online'),
             'priority' => 300,
           ],
         ];
@@ -203,19 +205,19 @@ if ((elgg_is_logged_in()) &&($filter_context != 'group'))
             'all' => array(
                 'text' => elgg_echo('all'),
                 'href' => (isset($filter_params['all_link'])) ? $filter_params['all_link'] . $href : "$context/all" . $href,
-                'selected' => ($filter_params['filter_context'] == 'all'),
+                'selected' => ($filter_context == 'all'),
                 'priority' => 200,
             ),
             'mine' => array(
                 'text' => elgg_echo('mine'),
                 'href' => (isset($filter_params['mine_link'])) ? $filter_params['mine_link'] . $href : "$context/owner/$username"  . $href,
-                'selected' => (($filter_params['filter_context'] == 'mine')||($filter_params['filter_context'] == 'owner')),
+                'selected' => (($filter_context == 'mine')||($filter_context == 'owner')),
                 'priority' => 300,
             ),
             'friend' => array(
                 'text' => elgg_echo('friends'),
                 'href' => (isset($filter_params['friend_link'])) ? $filter_params['friend_link']   . $href: "$context/friends/$username" . $href,
-                'selected' => ($filter_params['filter_context'] == 'friends'),
+                'selected' => ($filter_context == 'friends'),
                 'priority' => 400,
             ),
         );
@@ -224,16 +226,16 @@ if ((elgg_is_logged_in()) &&($filter_context != 'group'))
             $tabs['tags'] = array(
                 'text' => elgg_echo('tags'),
                 'href' => "activity/tags" . $href,
-                'selected' => ($filter_params['filter_context'] == 'tags'),
+                'selected' => ($filter_context == 'tags'),
                 'priority' => 9999,
                 "name" => "tags",
             );
 
         if ((elgg_is_active_plugin('blog_tools'))&&($context == 'blog'))
             $tabs['featured'] = array(
-                'text' => elgg_echo('blog_tools:menu:filter:featured'),
+                'text' => elgg_echo('status:featured'),
                 'href' => "blog/featured" . $href,
-                'selected' => ($filter_params['filter_context'] == 'featured'),
+                'selected' => ($filter_context == 'featured'),
                 'priority' => 600,
                 "name" => "featured",
             );
@@ -398,6 +400,7 @@ if (!$filter_params['no_sort'])
 
     if (($filter_context != 'online')
       &&($filter_context != 'popular')
+      &&($filter_context != 'ordered')
       &&($context != 'activity'))
         $filter_options .= '<div class="elgg-filter-option-even"><label title="' . elgg_echo('sort:title:label:sort') . '"><small>' . elgg_echo('sort:label') . '</label></small> ' . elgg_view('input/dropdown', $params) . '</div>';
 
@@ -415,7 +418,7 @@ if (!$filter_params['no_sort'])
 
     // CONTAINER SELECTOR
     // conditionally display the container selector only if user is logged into an appropriate context and the river selector is not set to user or group
-    if ((elgg_is_logged_in())&&($filter_params['filter_context']!='group')&&($context != 'members')&&($context != 'groups')&&($filter_params['objtype']!= 'type=user')&&($filter_params['objtype']!= 'type=group'))
+    if ((elgg_is_logged_in())&&($filter_context!='group')&&($context != 'members')&&($context != 'groups')&&($filter_params['objtype']!= 'type=user')&&($filter_params['objtype']!= 'type=group'))
     {
         $groups = casort($current_user->getGroups(array('limit'=>0),0), "name");
         if ($groups)
@@ -450,12 +453,14 @@ if (!$filter_params['no_sort'])
         $default_from_date = strtotime('-10 year');
         $default_to_date = time();
 
-        $params['value'] = $filter_params['timing-from'];
+
+
+        // if the ui points to 'all' for the timing-from value then use the default from date
         if ($filter_params['timing-from'] == 'all')
         {
           $filter_params['timing-from'] = $default_from_date;
         }
-
+         $params['value'] = $filter_params['timing-from'];
          $filter_options .= '<div class="clearfloat"></div>';
          $filter_options .= '<div class="elgg-filter-option-odd">';
 

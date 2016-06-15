@@ -54,7 +54,7 @@ if (!$friends = $page_owner->getFriends(array('limit'=> 0))) {
     // set subtype specific options
     switch ($object_type['subtype'])
     {
-    case 'groupforumtopic':
+    case 'discussion':
         {
             // load lighbox files to support 'add discussion' dialog
            // elgg_load_js('lightbox');
@@ -228,7 +228,7 @@ if (!$friends = $page_owner->getFriends(array('limit'=> 0))) {
                                                               'page_type' => $object_type['subtype']));
 
     $list = elgg_list_entities($sort_filter_options['options'],$sort_filter_options['getter']);
-        if (elgg_is_xhr())
+    if (elgg_is_xhr())
     {
             echo $list;
     }
@@ -237,10 +237,10 @@ if (!$friends = $page_owner->getFriends(array('limit'=> 0))) {
             $params['content'] = $list;
 
             $sort_filter_options['options']['count'] = TRUE;
-            if ($sort_filter_options['getter'] == 'elgg_get_entities_from_annotation_calculation')
-                $count = elgg_get_entities_from_annotation_calculation($sort_filter_options['options']);
-            else
-                $count = elgg_get_entities($sort_filter_options['options']);
+
+            // count the list size
+            $count = filter_and_sort_count_list($sort_filter_options['getter'],
+                                                $sort_filter_options['options']);
 
             if ($count == 0) {
                  if ($sort_filter_options['no-items'])
@@ -266,7 +266,7 @@ else
         }
         else
         {
-            elgg_load_js('tidypics');
+            elgg_require_js('tidypics/tidypics');
             elgg_load_js('lightbox');
             elgg_load_css('lightbox');
             if (elgg_get_plugin_setting('slideshow', 'tidypics')) {

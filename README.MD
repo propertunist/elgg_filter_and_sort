@@ -1,7 +1,7 @@
 =============================
 PLUGIN NAME
 =============================
-Filter & sort - for elgg 1.12.x
+Filter & sort - for elgg 2.x
 
 =============================
 PLUGIN DESCRIPTION

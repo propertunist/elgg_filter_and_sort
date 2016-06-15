@@ -1,29 +1,29 @@
 <div class="filter_and_sort-panel">
 <?php
+elgg_require_js('filter_and_sort/admin_ui');
         $supported_list_handlers = array(
-                                         'activity',
-                                         'blog',
-                                         'pages',
-                                         'file',
-                                         'bookmarks',
-                                         'thewire',
-                                         'photos',
-                                         'pinboards',
-                                         'discussion',
-                                         'members',
-                                         'groups',
-                                      //   'search'
+                                         'activity' => 'activity',
+                                         'blog' => 'blog',
+                                         'pages' => 'pages',
+                                         'file' => 'file',
+                                         'bookmarks' => 'bookmarks',
+                                         'thewire' => 'thewire',
+                                         'photos' => 'photos',
+                                         'pinboards' => 'pinboards',
+                                         'discussion' => 'discussion',
+                                         'members' => 'members',
+                                         'groups' => 'groups',
+                                      //   'search' => 'search',
                                        );
 
         $optional_list_handlers = array('videolist',
                                         'poll');
-);
 
         // build list of list handlers that can be used
         foreach ($optional_list_handlers as $list_handler)
         {
             if (elgg_is_active_plugin($list_handler))
-              $supported_list_handlers[] = $list_handler;
+              $supported_list_handlers[$list_handler] = $list_handler;
         }
 
         $limit_1 = elgg_get_plugin_setting('limit_1','filter_and_sort');
@@ -59,8 +59,7 @@
 
 	$list_handlers = elgg_get_plugin_setting('list_handlers','filter_and_sort');
 	if (!$list_handlers) {
-		$list_handlers = array();
-		elgg_set_plugin_setting('list_handlers',$list_handlers,'filter_and_sort');
+		$list_handlers = array('');
 	}
 
   $hypelists_refresh = elgg_get_plugin_setting('hypelists_refresh','filter_and_sort');
@@ -95,9 +94,18 @@
         echo elgg_echo('filter_and_sort:admin:list_types');
         echo "<br/><br/>";
 
-	$content = '<div class="list_types">';
 
 	$list_handlers = array_filter(explode(',', $vars["entity"]->list_handlers));
+
+  /*$checked_handlers = array();
+  foreach ($supported_list_handlers as $supported_list_handler)
+  {
+      if (in_array($supported_list_handler, $list_handlers))
+      {
+          $checked_handlers[] = $supported_list_handler;
+      }
+  }*/
+  $content = '<div class="list_types">';
 	$content .= elgg_view('input/checkboxes',array(
                 'name'=>'subtypes',
                 'value'=>$list_handlers,
@@ -141,24 +149,3 @@ echo '<br/>IF YOU VALUE THIS PLUGIN, CONSIDER MAKING A DONATION AT <a href="www.
 
 ?>
 </div>
-<script type="text/javascript">
-	$(document).ready(function(){
-    // disable / enable areas based on plugin activation status
-    $('.hypelists-enabled').prop( "disabled", false );
-    $('.hypelists-disabled').prop( "disabled", true );
-		// each time you click a checkbox to update; loops through all the hidden
-		$('.list_types input[type=checkbox]').click(function(){
-			$('#list_types_hidden').val("");
-			$('.list_types input[type=checkbox]').each(function(){
-				if ( $(this).is(':checked') ){
-					// ugly hack to not render the first comma
-					if ( $('#list_types_hidden').val() == ""){
-						$('#list_types_hidden').val( $(this).val() );
-					}else{
-						$('#list_types_hidden').val( $('#list_types_hidden').val() + ',' + $(this).val() );
-					}
-				}
-			});
-		});
-	});
-</script>
