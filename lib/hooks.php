@@ -26,10 +26,12 @@
 
  	switch ($page[0]) {
  		case 'tags':
+    {
  			$return_value = false;
-
- 			include(dirname(dirname(__FILE__)) . '/pages/river.php');
+      $params['page_type'] = 'tags';
+ 			echo elgg_view_resource("river", $params);
  			break;
+    }
  	}
 
  	return $return_value;

@@ -16,6 +16,7 @@ $options = array(
 	'distinct' => false
 );
 $db_prefix = elgg_get_config('dbprefix');
+$page_type = preg_replace('[\W]', '', elgg_extract('page_type', $vars, 'all'));
 
 switch ($page_type) {
 	case 'mine':
@@ -32,7 +33,7 @@ switch ($page_type) {
 		}
 		elgg_set_page_owner_guid($subject->guid);
 		$title = elgg_echo('river:owner', array(htmlspecialchars($subject->name, ENT_QUOTES, 'UTF-8', false)));
-		$page_filter = 'subject';
+		$page_filter = 'owner';
 		$options['subject_guid'] = $subject->guid;
 		break;
 	case 'friends':
@@ -48,6 +49,7 @@ switch ($page_type) {
 		elgg_set_page_owner_guid(elgg_get_logged_in_user_guid());
 		$tags = tag_tools_get_user_following_tags();
 		if (empty($tags)) {
+			register_error(elgg_echo('tag_tools:notifications:empty'));
 			forward('activity');
 		}
 
@@ -58,7 +60,7 @@ switch ($page_type) {
 
 		$title = elgg_echo('tag_tools:activity:tags');
 		$tags_id = elgg_get_metastring_id('tags');
-
+		$page_filter = 'tags';
 		$options['joins'] = ["JOIN {$dbprefix}metadata md ON rv.object_guid = md.entity_guid"];
 		$options['wheres'] = ["(md.name_id = {$tags_id}) AND md.value_id IN (" . implode(',', $name_ids) . ")"];
 		break;

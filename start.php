@@ -63,7 +63,7 @@ function filter_and_sort_init()
     // add support for tag_tools
     if (elgg_is_active_plugin('tag_tools'))
     {
-        elgg_unregister_plugin_hook_handler('route', 'activity', 'tag_tools_route_activity_hook');
+        elgg_unregister_plugin_hook_handler('route', 'activity', '\ColdTrick\TagTools\Router::activity');
         elgg_register_plugin_hook_handler('route', 'activity', 'filter_and_sort_tag_tools_route_activity_hook');
 
         elgg_unregister_plugin_hook_handler('register', 'menu:filter', 'tag_tools_activity_filter_menu_hook_handler');
