@@ -385,7 +385,7 @@ if (!$filter_params['no_sort'])
         $toggle_button .= '</div>';
     }
 
-    $active_filters = '<div id="elgg-sort-filtering">' . $active_filter_list . $reset_all_filters . '</div>' . $toggle_button . $more_options_link;
+    $active_filters = '<div id="elgg-sort-filtering">' . $active_filter_list . $reset_all_filters . '</div>' . $toggle_button . $more_options_link . '<div class="clearfloat"></div>';
 
     // ICON ONLY SELECTOR
 

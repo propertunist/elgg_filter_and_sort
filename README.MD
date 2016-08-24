@@ -52,7 +52,9 @@ the 'list type' toggle button is now enabled by default for all list types, to a
 to do:
 
 * support for search results lists
-* integrate in with supajax plugin to allow full ajaxed lists and sorting/filtering.
+* support for comments
+* support for sorting activity results lists
+* support for sorting other lists (liked content, related items - etc.)
 
 IF YOU VALUE THIS PLUGIN, CONSIDER MAKING A DONATION AT www.ureka.org/donation
 
@@ -69,3 +71,12 @@ added: support for river activity
 added: support for tag_tools
 added: datepickers
 fixed: removed hjcategories from the subtype selector on activity page
+
+2.0
+added: compatibility for elgg 2.x
+
+2.0.1
+fixed: activity page switch did not work
+
+2.2
+added: compatibility for elgg 2.2

@@ -1,6 +1,5 @@
 <?php
 elgg_push_context('activity');
-elgg_unregister_js('elgg.ui.river');
 
 $guid = elgg_extract('guid', $vars);
 elgg_entity_gatekeeper($guid, 'group');

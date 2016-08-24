@@ -31,12 +31,13 @@ if ($page == 'upload') {
 } else if (($page == 'all') || ($page == 'owner') || ($page == 'friends')) {
 
 
-        if(elgg_is_logged_in()) {
-                elgg_register_menu_item('page', array('name' => 'E10_tidypics_usertagged',
-                                        'text' => elgg_echo('tidypics:usertagged'),
-                                        'href' => $base . "tagged?guid=$current_user_guid",
-                                        'section' => 'E'));
-        }
+/*
+if(elgg_is_logged_in()) {
+elgg_register_menu_item('page', array('name' => 'E10_tidypics_usertagged',
+                        'text' => elgg_echo('tidypics:usertagged'),
+                        'href' => $base . "tagged?guid=$current_user_guid",
+                        'section' => 'E'));
+}*/
 
 } else if ($image && $page == 'tp_view') {
         if (elgg_get_plugin_setting('exif', 'tidypics')) {

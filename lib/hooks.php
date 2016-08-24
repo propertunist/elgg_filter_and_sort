@@ -7,6 +7,26 @@
  *******************/
 
  /**
+  * route activity page to custom resource if needed
+  *
+  * @param string $hook         the name of the hook
+  * @param string $type         the type of the hook
+  * @param array  $return_value the current return value
+  * @param array  $params       supplied params
+  *
+  * @return array|bool
+  */
+
+ function filter_and_sort_alter_river($hook, $type, $return_value, $params){
+  if (($hook !== 'view')||($type !== 'resources/river')) {
+      return $returnvalue;
+  }
+  else {
+    return elgg_view_resource('filter_and_sort_river', $params['vars']);
+  }
+ }
+
+ /**
   * route tag tools' tag tab on activity page to the correct filter_and_sort page
   *
   * @param string $hook         the name of the hook
@@ -153,7 +173,7 @@ function filter_and_sort_route_hook($hook, $type, $return_value, $params){
             set_input("subject_username", $page[1]);
             set_input("page_type",$page_type);
             // filter_and_sort js replaces the core js for handling subtypes on activity page
-            elgg_unregister_js('elgg.ui.river');
+
             $result = false;
 
             include(dirname(dirname(__FILE__)) . "/pages/river.php");

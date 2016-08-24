@@ -38,8 +38,10 @@ function filter_and_sort_init()
             $list_handler = $mods[$list_handler];
         }
 
-        // river page is handled in the resource view
-        if ($list_handler != 'activity')
+        // river page is handled by it's own handler
+        if ($list_handler == 'activity')
+            elgg_register_plugin_hook_handler('view', 'resources/river', 'filter_and_sort_alter_river');
+        else
             elgg_register_plugin_hook_handler("route", $list_handler, "filter_and_sort_route_hook", 100);
     }
 

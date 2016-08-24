@@ -159,15 +159,15 @@ switch ($object_type['subtype'])
             $params['sidebar'] = elgg_view('photos/sidebar', array('page' => 'all'));
             $no_items = elgg_echo('tidypics:none');
             $options['list_type'] = 'gallery';
-            $options['gallery_class'] = 'tidypics-gallery';
+            $options['gallery_class'] = 'tidypics-gallery tidypics-album-list';
             $options['list_class'] = 'elgg-list elgg-list-entity';
 
             if (elgg_is_logged_in()) {
                     $logged_in_guid = elgg_get_logged_in_user_guid();
                     elgg_register_menu_item('title', array('name' => 'addphotos',
-                                                           'href' => "ajax/view/photos/selectalbum/?owner_guid=" . $logged_in_guid,
-                                                           'text' => elgg_echo("photos:addphotos"),
-                                                           'link_class' => 'elgg-button elgg-button-action elgg-lightbox'));
+                    'href' => "ajax/view/photos/selectalbum/?owner_guid=" . $logged_in_guid,
+                   'text' => elgg_echo("photos:addphotos"),
+                   'link_class' => 'elgg-button elgg-button-action elgg-lightbox'));
             }
             break;
         }
@@ -181,15 +181,16 @@ switch ($object_type['subtype'])
             $params['sidebar'] = elgg_view('photos/sidebar', array('page' => 'all'));
             $no_items = elgg_echo('filter_and_sort:owner:none');
             $options['list_type'] = 'gallery';
-            $options['gallery_class'] = 'tidypics-gallery';
+            $options['gallery_class'] = 'tidypics-gallery tidypics-image-list';
             $options['list_class'] = 'elgg-list elgg-list-entity';
 
             if (elgg_is_logged_in()) {
                     $logged_in_guid = elgg_get_logged_in_user_guid();
-                    elgg_register_menu_item('title', array('name' => 'addphotos',
-                                                           'href' => "ajax/view/photos/selectalbum/?owner_guid=" . $logged_in_guid,
-                                                           'text' => elgg_echo("photos:addphotos"),
-                                                           'link_class' => 'elgg-button elgg-button-action elgg-lightbox'));
+                    elgg_register_menu_item('title', array(
+                        'name' => 'addphotos',
+                        'href' => "ajax/view/photos/selectalbum/?owner_guid=" . $logged_in_guid,
+                        'text' => elgg_echo("photos:addphotos"),
+                        'link_class' => 'elgg-button elgg-button-action elgg-lightbox'));
             }
 
             // only show slideshow link if slideshow is enabled in plugin settings and there are images
@@ -199,10 +200,10 @@ switch ($object_type['subtype'])
                     $url = elgg_format_url($url);
                     $slideshow_link = "javascript:PicLensLite.start({maxScale:0, feedUrl:'$url'})";
                     elgg_register_menu_item('title', array('name' => 'slideshow',
-                                                            'href' => $slideshow_link,
-                                                            'text' => "<img src=\"".elgg_get_site_url() ."mod/tidypics/graphics/slideshow.png\" alt=\"".elgg_echo('album:slideshow')."\">",
-                                                            'title' => elgg_echo('album:slideshow'),
-                                                            'class' => 'elgg-button elgg-button-action'));
+                    'href' => $slideshow_link,
+                    'text' => "<img src=\"".elgg_get_site_url() ."mod/tidypics/graphics/slideshow.png\" alt=\"".elgg_echo('album:slideshow')."\">",
+                    'title' => elgg_echo('album:slideshow'),
+                    'class' => 'elgg-button elgg-button-action'));
             }
 
             $logged_in_user = elgg_get_logged_in_user_entity();
@@ -215,24 +216,24 @@ switch ($object_type['subtype'])
         }
 
     default:
-        {
-            break;
-        }
+    {
+        break;
+    }
 }
 //elgg_dump($filter_params);
 $sort_filter_options = elgg_get_sort_filter_options(array('options' => $options,
-                                                          'filter_params' => $filter_params,
-                                                          'page_type' => $object_type['subtype']));
+        'filter_params' => $filter_params,
+        'page_type' => $object_type['subtype']));
 //elgg_dump($sort_filter_options);
 $list = elgg_list_entities($sort_filter_options['options'],$sort_filter_options['getter']);
 
 if (elgg_is_xhr())
 {
-        echo $list;
+    echo $list;
 }
 else
 {
-        $params['content'] = $list;
+    $params['content'] = $list;
 
         // count the list size
     //    $count = filter_and_sort_count_list($sort_filter_options['getter'],
@@ -248,35 +249,68 @@ else
 //            $params['content'] = $list;
 //        }
 
-        $filter_params = $sort_filter_options['filter_params'];
-        $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];
+    $filter_params = $sort_filter_options['filter_params'];
+    $filter_params['cookie_loaded'] = $sort_filter_options['cookie_loaded'];
 
-        if (($object_type['subtype'] != 'image')&& ($object_type['subtype'] != 'album'))
+    if (($object_type['subtype'] != 'image')&& ($object_type['subtype'] != 'album'))
+    {
+        $filter_params['toggle'] = elgg_filter_and_sort_register_toggle($filter_params['list_type']);
+    }
+    else
+    {
+        elgg_load_css('slick');
+        elgg_load_css('slick-theme');
+        elgg_load_css('elgg.slick');
+        if ($object_type['subtype'] == 'image')
         {
-            $filter_params['toggle'] = elgg_filter_and_sort_register_toggle($filter_params['list_type']);
+           if ((elgg_is_active_plugin('tidypics_plus'))&&('yes' == elgg_get_plugin_setting('justified_gallery_list', 'tidypics_plus')))
+           {
+               	elgg_require_js('justifiedGallery');
+               	if (elgg_is_active_plugin('hypeLists'))
+               		elgg_require_js('init_justifiedGallery/init_justifiedGallery_hypeList');
+               	else
+               		elgg_require_js('init_justifiedGallery/init_justifiedGallery');
+               	elgg_load_css('justified-gallery-on');
+            }
         }
-        else
+        if ($object_type['subtype'] == 'album')
         {
-            elgg_require_js('tidypics/tidypics');
-            elgg_load_js('lightbox');
-            elgg_load_css('lightbox');
-            if (elgg_get_plugin_setting('slideshow', 'tidypics')) {
-                elgg_load_js('tidypics:slideshow');
+            if (('yes' == elgg_get_plugin_setting('album_masonry', 'tidypics_plus'))&&(elgg_is_active_plugin('tidypics_plus')))
+            {
+                elgg_require_js('isotope');
+                if (elgg_is_active_plugin('hypeLists'))
+                {
+           		   elgg_require_js('init_isotope/init_isotope-hypeList');
+                }
+           	    else
+                {
+           		   elgg_require_js('init_isotope/init_isotope');
+                }
             }
         }
 
-        // store the current list filter options to a cookie
-        filter_and_sort_set_cookie(array('context' => elgg_get_context(),
-                                'list_type' => $filter_params['list_type'],
-                                'limit' => $filter_params['limit'],
-                                'contain' => $filter_params['contain'],
-                                'sort' => $filter_params['sort'],
-                                'timing-from' => $filter_params['timing-from'],
-        												'timing-to' => $filter_params['timing-to'],
-                                'status' => $filter_params['status']));
+        elgg_require_js('tidypics/tidypics');
+        elgg_require_js('elgg/lightbox');
+        elgg_load_css('lightbox');
+        if (elgg_is_active_plugin('tidypics_plus'))
+           elgg_require_js('tidypics_plus/tidypics_plus');
+        if (elgg_get_plugin_setting('slideshow', 'tidypics')) {
+            elgg_load_js('tidypics:slideshow');
+        }
+    }
 
-        $params['filter'] = elgg_view('page/layouts/content/sort_filter',array('filter_params' => $filter_params));
-        $body = elgg_view_layout('content', $params);
+    // store the current list filter options to a cookie
+    filter_and_sort_set_cookie(array('context' => elgg_get_context(),
+                            'list_type' => $filter_params['list_type'],
+                            'limit' => $filter_params['limit'],
+                            'contain' => $filter_params['contain'],
+                            'sort' => $filter_params['sort'],
+                            'timing-from' => $filter_params['timing-from'],
+    												'timing-to' => $filter_params['timing-to'],
+                            'status' => $filter_params['status']));
 
-        echo elgg_view_page($title, $body);
+    $params['filter'] = elgg_view('page/layouts/content/sort_filter',array('filter_params' => $filter_params));
+    $body = elgg_view_layout('content', $params);
+
+    echo elgg_view_page($title, $body);
 }

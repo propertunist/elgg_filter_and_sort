@@ -590,6 +590,11 @@ function elgg_get_sort_filter_options($vars)
     {
       $options['auto_refresh'] = elgg_get_plugin_setting('hypelists_refresh', 'filter_and_sort');
       $options['lazyLoad'] = elgg_get_plugin_setting('hypelists_lazy', 'filter_and_sort');
+      $options['pagination'] = true;
+      $options['pagination_type'] = 'infinite';
+      $options['list_id'] = 'main_content_list';
+      $options['position'] = 'after';
+  	  $options['offset'] = get_input('offset', $count - $limit);
       //   $options['data-baseUrl'] = current_page_url();
     }
 

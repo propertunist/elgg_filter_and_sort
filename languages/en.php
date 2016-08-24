@@ -84,6 +84,7 @@ return array (
   'sort:type=object&subtype=thewire' => 'wire posts',
   'sort:type=object&subtype=image' => 'photos',
   'sort:type=object&subtype=album' => 'photo albums',
+  'sort:type=object&subtype=tidypics_batch' => 'photo batch',
   'sort:type=object&subtype=poll' => 'polls',
   'sort:type=user' => 'users',
   'sort:type=object&subtype=hjcategory' => 'categories',
